@@ -16,3 +16,9 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+
+jwt:
+  secret-key: ${JWT_SECRET}
+  expiration:
+    access-token:
+  issuer: exlog
