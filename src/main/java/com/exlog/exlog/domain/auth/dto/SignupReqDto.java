@@ -12,4 +12,5 @@ public class SignupReqDto {
     private String email;
     private String password;
     private String username;
+    private String gender;
 }
