@@ -26,6 +26,9 @@ public class User {
     private Long userId; // PK
 
     @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String username; // 로그인한 사용자의 이름(닉네임)
 
     @Column(nullable = false , unique = true) // 이메일 중복 금지 unique설정
