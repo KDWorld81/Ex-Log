@@ -8,7 +8,7 @@ import com.exlog.exlog.domain.auth.entity.Tier;
 import com.exlog.exlog.domain.auth.entity.User;
 import com.exlog.exlog.domain.auth.repository.RefreshTokenRepository;
 import com.exlog.exlog.domain.auth.repository.UserRepository;
-import com.exlog.exlog.security.JwtProvider;
+import com.exlog.exlog.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ public class AuthService {
                 .email(signupReqDto.getEmail())
                 .password(passwordEncoder.encode(signupReqDto.getPassword()))
                 .username(signupReqDto.getUsername())
+                .gender(signupReqDto.getGender())
                 .totalExp(0L)
                 .tier(Tier.BRONZE)
                 .build();
@@ -67,7 +68,11 @@ public class AuthService {
         // 4. 리프레시 토큰 DB 저장 (이미 있다면 업데이트)
         saveRefreshToken(user.getEmail(), refreshToken);
 
-        return new LoginResDto(user.getUsername());
+        return LoginResDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .username(user.getUsername())
+                .build();
     }
 
     private void saveRefreshToken(String email, String token) {
