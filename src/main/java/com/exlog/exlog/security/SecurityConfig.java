@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt 암호화 도구를 빈으로 등록합니다. AuthService에 필요
+        // BCrypt 암호화 도구를 빈으로 등록 AuthService에 필요
         return new BCryptPasswordEncoder();
     }
 
