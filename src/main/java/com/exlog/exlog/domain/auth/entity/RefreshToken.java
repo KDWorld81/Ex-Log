@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_email")
     private String email; // 유저 식별을 위한 이메일
 
