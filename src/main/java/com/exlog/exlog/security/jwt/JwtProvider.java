@@ -1,4 +1,4 @@
-package com.exlog.exlog.security;
+package com.exlog.exlog.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
