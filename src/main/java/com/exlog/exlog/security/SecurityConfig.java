@@ -41,7 +41,9 @@ public class SecurityConfig {
                 // 3. 인가(Authorization) 규칙 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll() // 로그인, 회원가입은 누구나 허용
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/", "/login", "/signup").permitAll() // templates 폴더의 HTML 페이지 허용
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // 정적 리소스 허용
                         .anyRequest().authenticated() // 그 외의 모든 요청(운동 기록 등)은 로그인 필수
                 )
