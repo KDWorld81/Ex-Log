@@ -5,6 +5,7 @@ import com.exlog.exlog.domain.auth.dto.LoginResDto;
 import com.exlog.exlog.domain.auth.dto.SignupReqDto;
 import com.exlog.exlog.domain.auth.service.AuthService;
 import com.exlog.exlog.security.jwt.CookieUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,7 +21,7 @@ public class AuthController {
 
     // 회원가입 API
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupReqDto signupReqDto) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupReqDto signupReqDto) {
         authService.signUp(signupReqDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
