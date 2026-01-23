@@ -1,14 +1,13 @@
 package com.exlog.exlog.domain.auth.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 
 public class LoginReqDto {
-    private String email;
-    private String password;
+    private final String email;
+    private final String password;
 }

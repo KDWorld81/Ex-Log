@@ -2,14 +2,12 @@ package com.exlog.exlog.domain.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 
 // 로그인 후 메인화면 보일때 필요한
