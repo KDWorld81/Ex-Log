@@ -14,11 +14,11 @@ import lombok.RequiredArgsConstructor;
 public class LoginResDto {
 
     @JsonIgnore // 컨트롤러에서는 꺼낼수 있으나 JSON응답에는 포함되지 않도록
-    private String accessToken;
+    private final String accessToken;
 
     @JsonIgnore
-    private String refreshToken;
+    private final String refreshToken;
 
-    private String username;
+    private final String username;
 
 }
