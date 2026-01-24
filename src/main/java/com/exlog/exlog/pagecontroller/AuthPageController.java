@@ -1,4 +1,4 @@
-package com.exlog.exlog.pagecontroller.authpage;
+package com.exlog.exlog.pagecontroller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
