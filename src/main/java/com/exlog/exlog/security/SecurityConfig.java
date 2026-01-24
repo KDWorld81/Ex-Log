@@ -47,6 +47,12 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // 정적 리소스 허용
                         .anyRequest().authenticated() // 그 외의 모든 요청(운동 기록 등)은 로그인 필수
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // 인증되지 않은 사용자가 오면 /login 페이지로 리다이렉트 시킴
+                            response.sendRedirect("/login");
+                        })
+                )
 
                 // 4. JWT 필터 배치: Filter를 시큐리티 기본 검문소에 검문
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
