@@ -44,7 +44,7 @@
             if (response.ok) {
                 const result = await response.json();
                 alert(result.username + "님, 환영합니다!");
-                window.location.href = '/'; // 메인 페이지로 이동
+                window.location.href = '/category'; // 메인 페이지로 이동
             } else {
                 alert("로그인 실패: 이메일이나 비밀번호를 확인하세요.");
             }
