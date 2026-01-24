@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <title>Ex-Log 회원가입</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f7f6; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; }
-        h2 { text-align: center; color: #333; }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/exlogmark.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 350px; }
+        h2 { text-align: center; color: #333; margin-bottom: 25px; }
         .form-group { display: flex; flex-direction: column; gap: 15px; }
         input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.3s; }
-        button { padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { background-color: #218838; }
+        button { padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
+        button:hover { background-color: #0069d9; }
         .link { text-align: center; margin-top: 15px; font-size: 13px; }
+        .link a { color: #007bff; text-decoration: none; }
+        .link a:hover { text-decoration: underline; }
 
         .error-msg {
             color: #dc3545;
@@ -76,7 +89,6 @@
                 window.location.href = '/login';
             } else {
                 const errorData = await response.json();
-
                 Object.keys(errorData).forEach(field => {
                     showError(field, errorData[field]);
                 });
