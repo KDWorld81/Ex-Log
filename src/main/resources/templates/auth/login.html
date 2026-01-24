@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <title>Ex-Log 로그인</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f7f6; }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/exlogmark.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; }
         h2 { text-align: center; color: #333; }
         .form-group { display: flex; flex-direction: column; gap: 15px; }
@@ -44,7 +55,7 @@
             if (response.ok) {
                 const result = await response.json();
                 alert(result.username + "님, 환영합니다!");
-                window.location.href = '/'; // 메인 페이지로 이동
+                window.location.href = '/category';
             } else {
                 alert("로그인 실패: 이메일이나 비밀번호를 확인하세요.");
             }
