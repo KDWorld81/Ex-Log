@@ -18,7 +18,7 @@ public class CategoryService {
 
     public List<CategoryResDto> findAllCategories() {
         return categoryRepository.findAll().stream()
-                .map(category -> new CategoryResDto(category.getCategoryId(), category.getCategoryName()))
+                .map(CategoryResDto::fromEntity)
                 .collect(Collectors.toList());
     }
 }
