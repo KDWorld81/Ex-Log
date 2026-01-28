@@ -21,4 +21,12 @@ public class LoginResDto {
 
     private final String username;
 
+    public static LoginResDto from(String accessToken, String refreshToken, String username) {
+        return LoginResDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .username(username)
+                .build();
+    }
+
 }

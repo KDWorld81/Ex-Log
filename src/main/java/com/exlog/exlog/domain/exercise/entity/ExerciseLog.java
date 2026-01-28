@@ -3,6 +3,7 @@ package com.exlog.exlog.domain.exercise.entity;
 import com.exlog.exlog.domain.auth.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,12 +29,12 @@ public class ExerciseLog {
     @Column(name = "log_id")
     private Long logId;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
 
     @Column(nullable = false)

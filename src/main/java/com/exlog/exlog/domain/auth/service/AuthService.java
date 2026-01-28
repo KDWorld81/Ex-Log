@@ -4,82 +4,86 @@ import com.exlog.exlog.domain.auth.dto.LoginReqDto;
 import com.exlog.exlog.domain.auth.dto.LoginResDto;
 import com.exlog.exlog.domain.auth.dto.SignupReqDto;
 import com.exlog.exlog.domain.auth.entity.RefreshToken;
-import com.exlog.exlog.domain.auth.entity.Tier;
 import com.exlog.exlog.domain.auth.entity.User;
 import com.exlog.exlog.domain.auth.repository.RefreshTokenRepository;
 import com.exlog.exlog.domain.auth.repository.UserRepository;
+import com.exlog.exlog.exception.CustomException;
+import com.exlog.exlog.exception.ErrorCode;
 import com.exlog.exlog.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository; // 리프레시 토큰 저장용
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * 회원가입 메서드
+     * 회원가입을 처리하고 유저 정보를 저장
+     * @param signupReqDto 가입 신청 데이터
      */
     @Transactional
     public void signUp(SignupReqDto signupReqDto) {
-        if (userRepository.existsByEmail(signupReqDto.getEmail())) {
-            throw new RuntimeException("이미 존재하는 이메일입니다."); // TODO : GlobalException 전환 필요
-        }
-
-        // 비밀번호 암호화 및 유저 객체 생성
-        User user = User.builder()
-                .email(signupReqDto.getEmail())
-                .password(passwordEncoder.encode(signupReqDto.getPassword()))
-                .username(signupReqDto.getUsername())
-                .gender(signupReqDto.getGender())
-                .totalExp(0L)
-                .tier(Tier.BRONZE)
-                .build();
-
+        validateDuplicateEmail(signupReqDto.getEmail());
+        User user = signupReqDto.toEntity(passwordEncoder);
         userRepository.save(user);
     }
 
     /**
-     * 로그인 메서드
+     * 로그인 인증 후 토큰 세트를 발급
+     * @param loginReqDto 로그인 요청 데이터
      */
     @Transactional
     public LoginResDto login(LoginReqDto loginReqDto) {
-
-        // 1. 이메일로 유저 조회
         User user = userRepository.findByEmail(loginReqDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 2. 비밀번호 일치 여부 확인
-        if (!passwordEncoder.matches(loginReqDto.getPassword(), user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
+        validatePassword(loginReqDto.getPassword(), user.getPassword());
 
-        // 3. JwtProvider를 사용하여 토큰 2종 발급
         String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getUsername(), user.getUserId());
         String refreshToken = jwtProvider.generateRefreshToken(user.getEmail(), user.getUsername(), user.getUserId());
 
-        // 4. 리프레시 토큰 DB 저장 (이미 있다면 업데이트)
         saveRefreshToken(user.getEmail(), refreshToken);
-
-        return LoginResDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .username(user.getUsername())
-                .build();
+        return LoginResDto.from(accessToken, refreshToken, user.getUsername());
     }
 
+    /**
+     * 리프레시 토큰을 DB에 저장하거나 갱신
+     * @param email 사용자 이메일
+     * @param token 리프레시 토큰
+     */
     private void saveRefreshToken(String email, String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByEmail(email)
                 .map(entity -> entity.updateToken(token))
                 .orElse(new RefreshToken(email, token));
 
         refreshTokenRepository.save(refreshToken);
+    }
+
+    /**
+     * 이메일 중복 여부를 확인
+     * @param email 검증할 이메일
+     */
+    private void validateDuplicateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+    }
+
+    /**
+     * 비밀번호 일치 여부를 검증
+     * @param rawPassword 입력된 비밀번호
+     * @param encodedPassword 암호화된 비밀번호
+     */
+    private void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
     }
 }
