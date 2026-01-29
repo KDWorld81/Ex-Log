@@ -17,62 +17,63 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
         .container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
+            width: 90%;
+            max-width: 900px;
+            padding: 40px 20px;
+            transition: all 0.3s ease;
         }
 
         h2 {
             text-align: center;
             color: var(--text-color);
-            margin-bottom: 30px;
-            font-size: 1.5rem;
+            margin-bottom: 50px;
+            font-size: 2rem;
         }
 
         .category-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .category-card {
             background: var(--card-bg);
             border: 2px solid transparent;
-            border-radius: 15px;
-            padding: 25px 20px;
+            border-radius: 20px;
+            padding: 40px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
             box-sizing: border-box;
         }
 
-        .category-card:last-child:nth-child(odd) {
-            grid-column: 1 / span 2;
-            justify-self: center;
-            width: calc(50% - 7.5px);
-        }
-
         .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
             border-color: var(--primary-color);
         }
 
         .category-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
             display: block;
         }
 
         .category-name {
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.4rem;
             color: var(--text-color);
         }
     </style>
@@ -100,8 +101,10 @@
                 card.className = 'category-card';
                 card.onclick = () => location.href = `/exercise/${cat.categoryId}`;
 
+                const icon = cat.categoryName === '유산소' ? '🏃' : '🏋️';
+
                 card.innerHTML = `
-                    <span class="category-icon">🏋️</span>
+                    <span class="category-icon">${icon}</span>
                     <span class="category-name">${cat.categoryName}</span>
                 `;
 
