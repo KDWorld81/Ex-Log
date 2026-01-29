@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ex-Log Exercise List</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+        }
+
+        h2 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.5rem;
+        }
+
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exercise-item {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .exercise-item:hover {
+            transform: scale(1.02);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .add-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="location.href='/category'">←</button>
+        <h2>운동 종목 선택</h2>
+    </div>
+    <div id="exercise-list" class="exercise-list"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const pathParts = window.location.pathname.split('/');
+        const categoryId = pathParts[pathParts.length - 1];
+        fetchExercises(categoryId);
+    });
+
+    async function fetchExercises(categoryId) {
+        try {
+            const response = await fetch(`/api/v1/exercise/category/${categoryId}`);
+            const exercises = await response.json();
+            const listContainer = document.getElementById('exercise-list');
+
+            exercises.forEach(ex => {
+                const item = document.createElement('div');
+                item.className = 'exercise-item';
+                item.onclick = () => {
+                    console.log("선택된 운동 ID:", ex.exerciseId);
+                };
+
+                item.innerHTML = `
+                    <span class="exercise-name">${ex.exerciseName}</span>
+                    <span class="add-icon">+</span>
+                `;
+
+                listContainer.appendChild(item);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
