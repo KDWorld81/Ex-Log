@@ -49,24 +49,19 @@
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
 
-        .category-card:last-child {
-            grid-column: span 2;
-            max-width: calc(50% - 7.5px);
-            margin: 0 auto;
-            width: 100%;
+        .category-card:last-child:nth-child(odd) {
+            grid-column: 1 / span 2;
+            justify-self: center;
+            width: calc(50% - 7.5px);
         }
 
         .category-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
             border-color: var(--primary-color);
-        }
-
-        .category-card.active {
-            border-color: var(--primary-color);
-            background-color: #ebf4ff;
         }
 
         .category-icon {
@@ -86,39 +81,35 @@
 
 <div class="container">
     <h2>어떤 부위를 운동하시나요?</h2>
-    <div class="category-grid">
-        <div class="category-card" onclick="selectCategory(this)">
-            <span class="category-icon">🏋️</span>
-            <span class="category-name">가슴</span>
-        </div>
-        <div class="category-card" onclick="selectCategory(this)">
-            <span class="category-icon">🏋️</span>
-            <span class="category-name">등</span>
-        </div>
-        <div class="category-card" onclick="selectCategory(this)">
-            <span class="category-icon">🏋️</span>
-            <span class="category-name">하체</span>
-        </div>
-        <div class="category-card" onclick="selectCategory(this)">
-            <span class="category-icon">🏋️</span>
-            <span class="category-name">어깨</span>
-        </div>
-        <div class="category-card" onclick="selectCategory(this)">
-            <span class="category-icon">🏋️</span>
-            <span class="category-name">팔</span>
-        </div>
-    </div>
+    <div id="category-grid" class="category-grid"></div>
 </div>
 
 <script>
-    function selectCategory(element) {
-        const cards = document.querySelectorAll('.category-card');
-        cards.forEach(card => card.classList.remove('active'));
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchCategories();
+    });
 
-        element.classList.add('active');
+    async function fetchCategories() {
+        try {
+            const response = await fetch('/api/v1/category');
+            const categories = await response.json();
+            const grid = document.getElementById('category-grid');
 
-        const category = element.querySelector('.category-name').innerText;
-        console.log("선택된 카테고리:", category);
+            categories.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.onclick = () => location.href = `/exercise/${cat.categoryId}`;
+
+                card.innerHTML = `
+                    <span class="category-icon">🏋️</span>
+                    <span class="category-name">${cat.categoryName}</span>
+                `;
+
+                grid.appendChild(card);
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 </script>
 
