@@ -3,10 +3,12 @@ spring:
     name: Ex-Log
 
   datasource:
-    url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
   sql:
     init:
@@ -23,7 +25,7 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
-  issuer: exlog
+  issuer: ${JWT_ISSUER}
   access-expiration: 1800000 # 30분
   refresh-expiration: 1209600000 # 14일
 
