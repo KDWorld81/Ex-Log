@@ -1,18 +1,27 @@
-# 사용할 기본 이미지
-FROM eclipse-temurin:21-jre-alpine
-
-# 작업 디렉토리 설정: 컨테이너 내부의 파일이 저장될 경로
+# 1단계: Builder Stage - 빌드를 전담하는 환경
+FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
-# JAR 파일 경로 변수 설정: Gradle 빌드 결과물의 위치를 지정
-# build.gradle의 description 'Ex-Log'와 version '0.0.1-SNAPSHOT'에 근거
-ARG JAR_FILE=build/libs/Ex-Log-0.0.1-SNAPSHOT.jar
+# 빌드에 필요한 파일들만 먼저 복사 (캐시 효율화)
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
 
-# JAR 파일 복사: 호스트의 JAR 파일을 컨테이너 안으로 복사
-COPY ${JAR_FILE} app.jar
+# 라이브러리 미리 다운로드 (코드가 바뀌어도 이 단계는 캐싱)
+RUN ./gradlew dependencies --no-daemon
 
-# 환경 변수 기본값 설정
-ENV SPRING_PROFILES_ACTIVE=prod
+# 소스 코드 복사 및 JAR 빌드
+COPY src src
+RUN ./gradlew clean build -x test --no-daemon
 
-# 실행 명령어: 애플리케이션을 실행합니다.
+# 2단계: Run Stage - 실행만 전담하는 가벼운 환경
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+# 빌드 단계에서 생성된 최종 JAR 파일만 빼오기
+COPY --from=builder /app/build/libs/*-SNAPSHOT.jar app.jar
+EXPOSE 8080
+
+# 컨테이너 실행 명령어
 ENTRYPOINT ["java", "-jar", "app.jar"]
