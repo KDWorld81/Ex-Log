@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ex-Log Exercise Recording</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+        }
+
+        h2 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.5rem;
+        }
+
+        .input-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .input-group { margin-bottom: 20px; }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="back-btn" id="go-back">←</button>
+        <h2 id="log-title">운동 기록</h2>
+    </div>
+
+    <div class="input-card">
+        <div class="input-group">
+            <label>세트 수</label>
+            <input type="number" id="sets" placeholder="예: 5" inputmode="numeric">
+        </div>
+        <div class="input-group">
+            <label>횟수 (reps)</label>
+            <input type="number" id="reps" placeholder="예: 12" inputmode="numeric">
+        </div>
+        <button class="save-btn" onclick="submitLog()">기록 완료</button>
+    </div>
+</div>
+
+<script>
+    let categoryId, exerciseId;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const pathParts = window.location.pathname.split('/');
+        exerciseId = pathParts[pathParts.length - 1];
+        categoryId = pathParts[pathParts.length - 3];
+
+        document.getElementById('go-back').onclick = () => {
+            location.href = `/exercise/${categoryId}`;
+        };
+    });
+
+    async function submitLog() {
+        const reps = document.getElementById('reps').value;
+        const sets = document.getElementById('sets').value;
+
+        if (!reps || !sets) {
+            alert("횟수와 세트를 입력해주세요!");
+            return;
+        }
+
+        const data = {
+            exerciseId: parseInt(exerciseId),
+            reps: parseInt(reps),
+            sets: parseInt(sets)
+        };
+
+        try {
+            const response = await fetch('/api/v1/exercise-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("성공적으로 기록되었습니다! 💪");
+                location.href = `/exercise/${categoryId}`;
+            } else {
+                alert("저장 실패");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+</script>
+
+</body>
+</html>
