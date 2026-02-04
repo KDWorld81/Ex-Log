@@ -17,9 +17,6 @@ public class ExerciseLogReqDto {
     private final Long exerciseId;
 
     @NotNull
-    private final Long userId;
-
-    @NotNull
     private final Long reps;
 
     @NotNull
