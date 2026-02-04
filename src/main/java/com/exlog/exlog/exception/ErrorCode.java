@@ -23,7 +23,10 @@ public enum ErrorCode {
     INVALID_PARAMETER(400, "파라미터 값을 확인해주세요."),
 
     // 500 서버
-    INTERNAL_SERVER_ERROR(500, "서버 에러입니다. 관리자에게 문의하세요.");
+    INTERNAL_SERVER_ERROR(500, "서버 에러입니다. 관리자에게 문의하세요."),
+
+    // ExerciseLog (운동기록)
+    EXERCISE_NOT_FOUND(404, "존재하지 않는 운동입니다.");
 
     private final int status;
     private final String message;

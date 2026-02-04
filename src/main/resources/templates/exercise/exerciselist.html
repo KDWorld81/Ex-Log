@@ -109,8 +109,9 @@
             exercises.forEach(ex => {
                 const item = document.createElement('div');
                 item.className = 'exercise-item';
+
                 item.onclick = () => {
-                    console.log("선택된 운동 ID:", ex.exerciseId);
+                    location.href = `/exercise/category/${categoryId}/log/${ex.exerciseId}`;
                 };
 
                 item.innerHTML = `

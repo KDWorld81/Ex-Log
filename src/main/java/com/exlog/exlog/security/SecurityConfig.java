@@ -2,6 +2,7 @@ package com.exlog.exlog.security;
 
 import com.exlog.exlog.security.jwt.JwtAuthenticationFilter;
 import com.exlog.exlog.security.jwt.JwtProvider;
+import com.exlog.exlog.security.userdetail.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomUserDetailsService customUserDetailsService) throws Exception {
         http
                 // 1. CSRF 비활성화: 우리는 세션이 아닌 JWT(쿠키)를 사용함
                 .csrf(AbstractHttpConfigurer::disable)
@@ -55,7 +56,7 @@ public class SecurityConfig {
                 )
 
                 // 4. JWT 필터 배치: Filter를 시큐리티 기본 검문소에 검문
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

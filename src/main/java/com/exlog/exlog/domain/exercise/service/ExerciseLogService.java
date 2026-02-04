@@ -1,0 +1,37 @@
+package com.exlog.exlog.domain.exercise.service;
+
+import com.exlog.exlog.domain.auth.entity.User;
+import com.exlog.exlog.domain.exercise.dto.ExerciseLogReqDto;
+import com.exlog.exlog.domain.exercise.entity.Exercise;
+import com.exlog.exlog.domain.exercise.entity.ExerciseLog;
+import com.exlog.exlog.domain.exercise.repository.ExerciseLogRepository;
+import com.exlog.exlog.domain.exercise.repository.ExerciseRepository;
+import com.exlog.exlog.exception.CustomException;
+import com.exlog.exlog.exception.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class ExerciseLogService {
+
+    private final ExerciseRepository exerciseRepository;
+    private final ExerciseLogRepository exerciseLogRepository;
+
+    public Long exerciseLogging(User user, ExerciseLogReqDto exerciseLogReqDto) {
+        // 해당 운동 종목이 존재하는가
+        Exercise exercise = exerciseRepository.findById(exerciseLogReqDto.getExerciseId())
+                .orElseThrow(() -> new CustomException(ErrorCode.EXERCISE_NOT_FOUND));
+
+        // 존재했다면 엔티티로 생성
+        ExerciseLog exerciseLog = exerciseLogReqDto.toEntity(user, exercise);
+
+        // 저장후 생성된 ID 반환
+        ExerciseLog savedLog = exerciseLogRepository.save(exerciseLog);
+
+        return savedLog.getLogId();
+
+    }
+}
