@@ -26,7 +26,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "서버 에러입니다. 관리자에게 문의하세요."),
 
     // ExerciseLog (운동기록)
-    EXERCISE_NOT_FOUND(404, "존재하지 않는 운동입니다.");
+    EXERCISE_NOT_FOUND(404, "존재하지 않는 운동입니다."),
+    INVALID_INPUT_TIME(400, "유산소 운동은 시간은 필수 입력 입니다."),
+    INVALID_INPUT_REPS_SETS(400,"근력운동은 세트와 횟수 필수 입력 입니다.");
 
     private final int status;
     private final String message;
