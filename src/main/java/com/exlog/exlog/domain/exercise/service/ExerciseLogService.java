@@ -25,6 +25,18 @@ public class ExerciseLogService {
         Exercise exercise = exerciseRepository.findById(exerciseLogReqDto.getExerciseId())
                 .orElseThrow(() -> new CustomException(ErrorCode.EXERCISE_NOT_FOUND));
 
+        if(exercise.getCategory().getCategoryId() == 6){
+            if(exerciseLogReqDto.getMinutes() == null || exerciseLogReqDto.getMinutes() <= 0 ||
+                    exerciseLogReqDto.getDistance() == null || exerciseLogReqDto.getDistance()<=0){
+                throw new CustomException(ErrorCode.INVALID_INPUT_TIME);
+            }
+        }
+        else{
+            if(exerciseLogReqDto.getReps() == null || exerciseLogReqDto.getReps() <= 0 ||
+                    exerciseLogReqDto.getSets() == null || exerciseLogReqDto.getSets() <= 0){
+                throw new CustomException(ErrorCode.INVALID_INPUT_REPS_SETS);
+            }
+        }
         // 존재했다면 엔티티로 생성
         ExerciseLog exerciseLog = exerciseLogReqDto.toEntity(user, exercise);
 

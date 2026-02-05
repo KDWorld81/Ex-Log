@@ -97,12 +97,12 @@
 
     <div class="input-card">
         <div class="input-group">
-            <label>세트 수</label>
-            <input type="number" id="sets" placeholder="예: 5" inputmode="numeric">
+            <label id="label-top">세트 수</label>
+            <input type="number" id="input-top" placeholder="예: 5" inputmode="numeric">
         </div>
         <div class="input-group">
-            <label>횟수 (reps)</label>
-            <input type="number" id="reps" placeholder="예: 12" inputmode="numeric">
+            <label id="label-bottom">횟수 (reps)</label>
+            <input type="number" id="input-bottom" placeholder="예: 12" inputmode="numeric">
         </div>
         <button class="save-btn" onclick="submitLog()">기록 완료</button>
     </div>
@@ -116,32 +116,42 @@
         exerciseId = pathParts[pathParts.length - 1];
         categoryId = pathParts[pathParts.length - 3];
 
+        if (categoryId === '6') {
+            document.getElementById('log-title').innerText = "유산소 기록";
+            document.getElementById('label-top').innerText = "운동 시간 (분)";
+            document.getElementById('input-top').placeholder = "예: 30";
+            document.getElementById('label-bottom').innerText = "거리 (km)";
+            document.getElementById('input-bottom').placeholder = "예: 5.5";
+            document.getElementById('input-bottom').setAttribute('step', '0.1');
+        }
+
         document.getElementById('go-back').onclick = () => {
             location.href = `/exercise/${categoryId}`;
         };
     });
 
     async function submitLog() {
-        const reps = document.getElementById('reps').value;
-        const sets = document.getElementById('sets').value;
+        const valTop = document.getElementById('input-top').value;
+        const valBottom = document.getElementById('input-bottom').value;
 
-        if (!reps || !sets) {
-            alert("횟수와 세트를 입력해주세요!");
+        if (!valTop || !valBottom) {
+            alert("모든 항목을 입력해주세요!");
             return;
         }
 
-        const data = {
-            exerciseId: parseInt(exerciseId),
-            reps: parseInt(reps),
-            sets: parseInt(sets)
-        };
+        const data = { exerciseId: parseInt(exerciseId) };
+        if (categoryId === '6') {
+            data.minutes = parseInt(valTop);
+            data.distance = parseFloat(valBottom);
+        } else {
+            data.sets = parseInt(valTop);
+            data.reps = parseInt(valBottom);
+        }
 
         try {
             const response = await fetch('/api/v1/exercise-log', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(data)
             });
@@ -150,7 +160,8 @@
                 alert("성공적으로 기록되었습니다! 💪");
                 location.href = `/exercise/${categoryId}`;
             } else {
-                alert("저장 실패");
+                const errorData = await response.json();
+                alert(errorData.message || "저장 실패");
             }
         } catch (error) {
             console.error("Error:", error);
