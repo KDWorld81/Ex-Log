@@ -16,11 +16,10 @@ public class ExerciseLogReqDto {
     @NotNull
     private final Long exerciseId;
 
-    @NotNull
     private final Long reps;
-
-    @NotNull
     private final Long sets;
+    private final Integer minutes;
+    private final Double distance;
 
     public ExerciseLog toEntity(User user, Exercise exercise) {
         return ExerciseLog.builder()
@@ -28,6 +27,8 @@ public class ExerciseLogReqDto {
                 .user(user)
                 .reps(this.reps)
                 .sets(this.sets)
+                .distance(this.distance)
+                .minutes(this.minutes)
                 .build();
     }
 
