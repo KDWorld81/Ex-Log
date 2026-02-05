@@ -41,16 +41,20 @@ public class ExerciseLog {
     @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
 
-    @Column(nullable = false)
+    @Column
     private Long reps;
 
-    @Column(nullable = false)
+    @Column
     private Long sets;
+
+    @Column
+    private Integer minutes; // 유산소 전용
+
+    @Column
+    private Double distance; // 유산소 전용
 
     @CreatedDate
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
-
-
 
 }
