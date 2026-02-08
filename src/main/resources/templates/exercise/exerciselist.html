@@ -11,76 +11,97 @@
             --text-color: #333;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Pretendard', -apple-system, sans-serif;
             background-color: var(--bg-color);
+            margin: 0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding-top: 50px;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
+            max-width: 480px;
+            background: var(--bg-color);
+            padding: 30px 20px 100px 20px;
+            min-height: 100vh;
         }
 
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 10px 0;
+            z-index: 10;
         }
 
         .back-btn {
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-right: 15px;
             background: none;
             border: none;
             color: var(--text-color);
-        }
-
-        h2 {
-            margin: 0;
-            color: var(--text-color);
-            font-size: 1.5rem;
-        }
-
-        .exercise-list {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: center;
         }
+
+        h2 { margin: 0; color: var(--text-color); font-size: 1.5rem; font-weight: 800; }
+
+        .exercise-list { display: flex; flex-direction: column; gap: 14px; }
 
         .exercise-item {
             background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 22px;
+            border-radius: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
             cursor: pointer;
+            border: 1px solid transparent;
         }
 
-        .exercise-item:hover {
-            transform: scale(1.02);
-            border-left: 4px solid var(--primary-color);
-        }
+        .exercise-item:active { transform: scale(0.97); background: #f1f5f9; }
 
-        .exercise-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--text-color);
-        }
+        .exercise-name { font-weight: 600; font-size: 1.15rem; color: var(--text-color); }
 
         .add-icon {
+            width: 30px;
+            height: 30px;
+            background: #E3F2FD;
             color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             font-size: 1.2rem;
         }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item { text-align: center; text-decoration: none; color: #ccc; font-size: 0.8rem; font-weight: 600; flex: 1; }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; font-style: normal; }
     </style>
 </head>
 <body>
@@ -92,6 +113,11 @@
     </div>
     <div id="exercise-list" class="exercise-list"></div>
 </div>
+
+<nav class="bottom-nav">
+    <a href="/category" class="nav-item"><i>🏠</i><span>메인</span></a>
+    <a href="/mypage" class="nav-item"><i>👤</i><span>마이페이지</span></a>
+</nav>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -105,25 +131,14 @@
             const response = await fetch(`/api/v1/exercise/category/${categoryId}`);
             const exercises = await response.json();
             const listContainer = document.getElementById('exercise-list');
-
             exercises.forEach(ex => {
                 const item = document.createElement('div');
                 item.className = 'exercise-item';
-
-                item.onclick = () => {
-                    location.href = `/exercise/category/${categoryId}/log/${ex.exerciseId}`;
-                };
-
-                item.innerHTML = `
-                    <span class="exercise-name">${ex.exerciseName}</span>
-                    <span class="add-icon">+</span>
-                `;
-
+                item.onclick = () => location.href = `/exercise/category/${categoryId}/log/${ex.exerciseId}`;
+                item.innerHTML = `<span class="exercise-name">${ex.exerciseName}</span><div class="add-icon">+</div>`;
                 listContainer.appendChild(item);
             });
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (error) { console.error(error); }
     }
 </script>
 

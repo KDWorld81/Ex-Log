@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ex-Log My Page</title>
+    <style>
+        :root { --primary-color: #4A90E2; --bg-color: #f8f9fa; --card-bg: #ffffff; --text-color: #333; --xp-color: #2ECC71; --title-color: #9B59B6; }
+
+        * { box-sizing: border-box; }
+
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px 20px 100px 20px;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+        }
+
+        .profile-card { background: var(--card-bg); padding: 30px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; width: 100%; }
+        .tier-badge { font-size: 0.8rem; font-weight: 800; color: var(--primary-color); text-transform: uppercase; }
+        .name-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; }
+        .user-name { font-size: 1.6rem; margin: 0; font-weight: 700; }
+        .main-title-tag { background: #F3E5F5; color: var(--title-color); padding: 2px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid #E1BEE7; }
+
+        .exp-container { background: #eee; height: 10px; border-radius: 5px; margin: 15px 0 5px; overflow: hidden; width: 100%; }
+        .exp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 1s ease; }
+        .exp-info { font-size: 0.75rem; color: #888; text-align: right; }
+
+        .button-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; width: 100%; }
+
+        .nav-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 1px solid #eef2f6;
+            border-radius: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .nav-btn:active { transform: scale(0.98); background: #f8f9fa; }
+        .btn-icon { color: var(--primary-color); font-size: 1.1rem; font-weight: bold; }
+
+        .challenge-card { background: #E3F2FD; padding: 20px; border-radius: 22px; margin-bottom: 20px; border: 1px dashed var(--primary-color); width: 100%; }
+        .challenge-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem; margin-bottom: 5px; }
+
+        .section-card { background: var(--card-bg); padding: 20px; border-radius: 22px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); width: 100%; }
+        .section-title { font-weight: 700; margin-bottom: 12px; font-size: 1rem; }
+        .grass-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; }
+        .cell { aspect-ratio: 1; background: #ebedf0; border-radius: 2px; }
+        .cell.active { background: #40c463; box-shadow: inset 0 0 2px rgba(0,0,0,0.1); }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #ffffff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; text-decoration: none; color: #ccc; font-size: 0.8rem; font-weight: 600; flex: 1; }
+        .nav-item.active { color: var(--primary-color); }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; font-style: normal; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="profile-card">
+        <div id="user-tier" class="tier-badge">LOADING...</div>
+        <div class="name-wrapper">
+            <h2 id="user-name" class="user-name">-</h2>
+            <span id="main-title" class="main-title-tag">-</span>
+        </div>
+        <div class="exp-container"><div id="exp-bar" class="exp-bar"></div></div>
+        <div id="exp-text" class="exp-info">0 XP</div>
+    </div>
+
+    <div class="button-group">
+        <a href="/history" class="nav-btn">
+            <span>📅 날짜별 상세 기록 확인</span>
+            <span class="btn-icon">→</span>
+        </a>
+        <a href="/titles" class="nav-btn">
+            <span>🏅 획득한 칭호 도감 보기</span>
+            <span class="btn-icon">→</span>
+        </a>
+    </div>
+
+    <div class="challenge-card">
+        <div class="challenge-header">
+            <span>🔥 오늘 3종목 챌린지</span>
+            <span id="challenge-count">0 / 3 완료</span>
+        </div>
+        <div id="challenge-desc" style="font-size: 0.85rem; color: #546E7A;">데이터 로딩 중...</div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">운동 스트릭 (최근 45일)</div>
+        <div class="grass-grid" id="grass-container"></div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="/category" class="nav-item"><i>🏠</i><span>메인</span></a>
+    <a href="/mypage" class="nav-item active"><i>👤</i><span>마이페이지</span></a>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/api/v1/mypage');
+            const data = await response.json();
+
+
+            console.log("MyPage Data:", data);
+
+            document.getElementById('user-tier').textContent = data.tier + ' TIER';
+            document.getElementById('user-name').textContent = data.username;
+            document.getElementById('main-title').textContent = data.mainTitle || '칭호 없음';
+
+            const currentExp = data.totalExp || 0;
+            const remaining = data.remainingExp || 0;
+            const totalNext = currentExp + remaining;
+            const percentage = totalNext === 0 ? 0 : (currentExp / totalNext) * 100;
+
+            document.getElementById('exp-bar').style.width = percentage + '%';
+            document.getElementById('exp-text').textContent = `다음 티어까지 ${remaining} XP 남음`;
+
+
+            const todayCount = data.todayExerciseCount || 0;
+            document.getElementById('challenge-count').textContent = `${todayCount} / 3 완료`;
+            if (todayCount >= 3) {
+                document.getElementById('challenge-desc').textContent = '✅ 오늘의 챌린지 성공! +5 XP 획득';
+            } else {
+                document.getElementById('challenge-desc').textContent = `오늘 ${3 - todayCount}종목 더 하면 경험치 +5 XP!`;
+            }
+
+
+            const container = document.getElementById('grass-container');
+            container.innerHTML = ''; // 기존 내용 초기화
+            const grassDates = data.grassData || [];
+
+
+            for (let i = 44; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+
+
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+
+                const cell = document.createElement('div');
+
+                cell.className = 'cell' + (grassDates.includes(dateStr) ? ' active' : '');
+                container.appendChild(cell);
+            }
+        } catch (e) {
+            console.error("Fetch Error:", e);
+            document.getElementById('user-name').textContent = '로그인 필요';
+        }
+    });
+</script>
+</body>
+</html>

@@ -11,84 +11,125 @@
             --text-color: #333;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Pretendard', -apple-system, sans-serif;
             background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
 
         .container {
-            width: 90%;
-            max-width: 900px;
-            padding: 40px 20px;
-            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-color);
+            padding: 40px 20px 100px 20px;
+            min-height: 100vh;
         }
 
-        h2 {
+        .welcome-section {
             text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h1 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .welcome-section h2 {
+            font-size: 1.8rem;
+            margin: 0;
             color: var(--text-color);
-            margin-bottom: 50px;
-            font-size: 2rem;
+            line-height: 1.3;
         }
 
         .category-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-        }
-
-        @media (min-width: 768px) {
-            .category-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            gap: 16px;
         }
 
         .category-card {
             background: var(--card-bg);
-            border: 2px solid transparent;
-            border-radius: 20px;
-            padding: 40px 20px;
+            border-radius: 24px;
+            padding: 35px 15px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
-            box-sizing: border-box;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            border: 2px solid transparent;
         }
 
         .category-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
             border-color: var(--primary-color);
+            box-shadow: 0 12px 25px rgba(74, 144, 226, 0.1);
         }
 
         .category-icon {
             font-size: 3.5rem;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: block;
         }
 
         .category-name {
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: var(--text-color);
         }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+            border-top: 1px solid #eee;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #ccc;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .nav-item.active { color: var(--primary-color); }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; font-style: normal; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>어떤 부위를 운동하시나요?</h2>
+    <div class="welcome-section">
+        <h1>오늘의 트레이닝</h1>
+        <h2>어떤 부위를<br>운동하시나요?</h2>
+    </div>
     <div id="category-grid" class="category-grid"></div>
 </div>
 
+<nav class="bottom-nav">
+    <a href="/category" class="nav-item active"><i>🏠</i><span>메인</span></a>
+    <a href="/mypage" class="nav-item"><i>👤</i><span>마이페이지</span></a>
+</nav>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchCategories();
-    });
+    document.addEventListener('DOMContentLoaded', fetchCategories);
 
     async function fetchCategories() {
         try {
@@ -100,19 +141,11 @@
                 const card = document.createElement('div');
                 card.className = 'category-card';
                 card.onclick = () => location.href = `/exercise/${cat.categoryId}`;
-
                 const icon = cat.categoryName === '유산소' ? '🏃' : '🏋️';
-
-                card.innerHTML = `
-                    <span class="category-icon">${icon}</span>
-                    <span class="category-name">${cat.categoryName}</span>
-                `;
-
+                card.innerHTML = `<span class="category-icon">${icon}</span><span class="category-name">${cat.categoryName}</span>`;
                 grid.appendChild(card);
             });
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (error) { console.error(error); }
     }
 </script>
 
