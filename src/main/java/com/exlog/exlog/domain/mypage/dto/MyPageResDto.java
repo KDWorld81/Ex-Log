@@ -27,7 +27,7 @@ public class MyPageResDto {
                         .tier(user.getTier().name())
                         .totalExp(user.getTotalExp())
                         .remainingExp(remainingExp)
-                        .mainTitle(user.getMainTitle().getTitleName() != null ? user.getMainTitle().getTitleName() : "칭호 없음")
+                        .mainTitle(user.getMainTitle() != null ? user.getMainTitle().getTitleName() : "칭호 없음")
                         .todayExerciseCount(todayExerciseCount)
                         .grassData(grassData)
                         .build();
