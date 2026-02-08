@@ -24,7 +24,7 @@ public class MyPageResDto {
         public static MyPageResDto fromEntity(User user, Long remainingExp, Long todayExerciseCount, List<LocalDate> grassData) {
                 return MyPageResDto.builder()
                         .username(user.getUsername())
-                        .tier(user.getTier().name())
+                        .tier(user.getTier() != null ? user.getTier().name() : "BRONZE")
                         .totalExp(user.getTotalExp())
                         .remainingExp(remainingExp)
                         .mainTitle(user.getMainTitle() != null ? user.getMainTitle().getTitleName() : "칭호 없음")
