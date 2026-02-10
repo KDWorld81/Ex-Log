@@ -41,6 +41,10 @@ public class ExerciseLog {
     @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column
     private Long reps;
 
