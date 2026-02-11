@@ -30,7 +30,7 @@ public class Title {
     @Column(name = "title_id")
     private Long titleId;
 
-    @Column(name = "title_name", nullable = false)
+    @Column(name = "title_name", unique = true, nullable = false)
     private String titleName;
 
     @Column(nullable = false)
