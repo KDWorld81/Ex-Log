@@ -2,10 +2,12 @@ package com.exlog.exlog.domain.exercise.service;
 
 import com.exlog.exlog.domain.auth.entity.User;
 import com.exlog.exlog.domain.exercise.dto.ExerciseLogReqDto;
+import com.exlog.exlog.domain.exercise.entity.Category;
 import com.exlog.exlog.domain.exercise.entity.Exercise;
 import com.exlog.exlog.domain.exercise.entity.ExerciseLog;
 import com.exlog.exlog.domain.exercise.repository.ExerciseLogRepository;
 import com.exlog.exlog.domain.exercise.repository.ExerciseRepository;
+import com.exlog.exlog.domain.title.service.UserTitleService;
 import com.exlog.exlog.exception.CustomException;
 import com.exlog.exlog.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class ExerciseLogService {
 
     private final ExerciseRepository exerciseRepository;
     private final ExerciseLogRepository exerciseLogRepository;
+    private final UserTitleService userTitleService;
 
     public Long exerciseLogging(User user, ExerciseLogReqDto exerciseLogReqDto) {
         // 해당 운동 종목이 존재하는가
@@ -37,12 +40,13 @@ public class ExerciseLogService {
                 throw new CustomException(ErrorCode.INVALID_INPUT_REPS_SETS);
             }
         }
+        Category category = exercise.getCategory();
         // 존재했다면 엔티티로 생성
-        ExerciseLog exerciseLog = exerciseLogReqDto.toEntity(user, exercise);
-
+        ExerciseLog exerciseLog = exerciseLogReqDto.toEntity(user, exercise, category);
         // 저장후 생성된 ID 반환
         ExerciseLog savedLog = exerciseLogRepository.save(exerciseLog);
 
+        userTitleService.checkAndGrantTitles(user);
         return savedLog.getLogId();
 
     }
