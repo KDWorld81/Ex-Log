@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ex-Log | 내 칭호 도감</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary: #4A90E2;
+            --text-main: #212529;
+            --text-sub: #868e96;
+            --title-purple: #9B59B6;
+        }
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 480px; padding: 20px; min-height: 100vh; }
+        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-top: 20px; }
+        .back-btn { text-decoration: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
+        h1 { font-size: 1.5rem; margin: 0; color: var(--text-main); }
+
+        .title-grid { display: flex; flex-direction: column; gap: 16px; }
+
+        .title-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 6px solid var(--title-purple);
+            transition: transform 0.2s;
+        }
+
+        .title-icon { font-size: 2rem; }
+        .title-info { flex: 1; }
+        .name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
+        .desc { font-size: 0.85rem; color: var(--text-sub); line-height: 1.4; margin: 0; }
+
+        .empty-msg { text-align: center; padding: 100px 0; color: #aaa; font-size: 0.9rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="/mypage" class="back-btn">←</a>
+        <h1>🏆 내 칭호 도감</h1>
+    </div>
+
+    <div id="titleGrid" class="title-grid">
+        <p style="text-align:center; color:#ccc;">칭호를 불러오는 중...</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 백엔드 API 호출
+        fetch('/api/v1/title/library')
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.getElementById('titleGrid');
+                grid.innerHTML = ''; // 로딩 문구 제거
+
+                if (!data || data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-msg">
+                            아직 획득한 칭호가 없습니다.<br>
+                            열심히 운동해서 도감을 채워보세요! 💪
+                        </div>`;
+                    return;
+                }
+
+                // 획득한 칭호 목록 렌더링
+                data.forEach(title => {
+                    grid.innerHTML += `
+                        <div class="title-card">
+                            <div class="title-icon">🎖️</div>
+                            <div class="title-info">
+                                <p class="name">${title.titleName}</p>
+                                <p class="desc">${title.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => {
+                console.error('API 호출 에러:', err);
+                document.getElementById('titleGrid').innerHTML =
+                    '<p style="text-align:center; color:red;">데이터를 불러오지 못했습니다. 다시 시도해주세요.</p>';
+            });
+    });
+</script>
+</body>
+</html>
