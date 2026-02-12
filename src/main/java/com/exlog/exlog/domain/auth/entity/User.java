@@ -1,6 +1,6 @@
 package com.exlog.exlog.domain.auth.entity;
 
-import com.exlog.exlog.domain.Title.entity.Title;
+import com.exlog.exlog.domain.title.entity.Title;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

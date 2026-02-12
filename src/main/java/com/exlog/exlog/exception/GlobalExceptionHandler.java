@@ -20,7 +20,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * 1. 커스텀 예외 (우리가 직접 발생시킨 예외)
+     * 1. 커스텀 예외
      */
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResDto> handleCustomException(CustomException ex) {
@@ -38,21 +38,17 @@ public class GlobalExceptionHandler {
      * 2. 유효성 검사
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ErrorResDto> handleValidationException(MethodArgumentNotValidException ex) {
-        ErrorCode errorCode = ErrorCode.INVALID_PARAMETER;
-
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        for(FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
-        }
 
-        ErrorResDto errorDto = new ErrorResDto(
-                errorCode.getMessage(),
-                errorCode.getStatus(),
-                errors
-        );
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
 
-        return new ResponseEntity<>(errorDto, HttpStatusCode.valueOf(errorCode.getStatus()));
+        // 프론트가 else 로직으로 가도록 400(Bad Request) 응답 전송
+        return ResponseEntity.badRequest().body(errors);
     }
 
     /**
