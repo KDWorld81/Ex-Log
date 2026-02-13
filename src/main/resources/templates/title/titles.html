@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ex-Log | 전체 칭호 도감</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --locked-color: #adb5bd;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-color);
+            padding: 40px 20px 100px 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .title-grid { display: flex; flex-direction: column; gap: 16px; }
+
+        .title-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .title-card.acquired { border-color: var(--primary-color); }
+        .title-card.acquired .title-icon { filter: none; }
+
+        .title-card.locked { opacity: 0.6; background: #eee; }
+        .title-card.locked .title-icon { filter: grayscale(100%); }
+
+        .title-icon { font-size: 2rem; }
+        .title-info { flex: 1; }
+        .name { font-weight: 700; font-size: 1.1rem; color: var(--text-color); margin: 0 0 4px 0; }
+        .desc { font-size: 0.85rem; color: #666; margin: 0; line-height: 1.4; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+            border-top: 1px solid #eee;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #ccc;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .nav-item.active { color: var(--primary-color); }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; font-style: normal; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎖️ 전체 칭호 도감</h1>
+    <div id="titleGrid" class="title-grid"></div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="/category" class="nav-item"><i>🏠</i><span>메인</span></a>
+    <a href="/titles" class="nav-item"><i>🎖️</i><span>칭호도감</span></a>
+    <a href="/mypage" class="nav-item"><i>👤</i><span>마이페이지</span></a>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const currPath = window.location.pathname;
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            if (item.getAttribute('href') === currPath) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        fetchTitles();
+    });
+
+    async function fetchTitles() {
+        try {
+            const response = await fetch('/api/v1/titles');
+            const data = await response.json();
+            const grid = document.getElementById('titleGrid');
+            grid.innerHTML = '';
+
+            data.forEach(title => {
+                const statusClass = title.isAcquired ? 'acquired' : 'locked';
+                const icon = title.isAcquired ? '🏆' : '🔒';
+
+                grid.innerHTML += `
+                    <div class="title-card ${statusClass}">
+                        <div class="title-icon">${icon}</div>
+                        <div class="title-info">
+                            <p class="name">${title.titleName}</p>
+                            <p class="desc">${title.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
