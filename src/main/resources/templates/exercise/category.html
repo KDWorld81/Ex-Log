@@ -124,9 +124,27 @@
 </div>
 
 <nav class="bottom-nav">
-    <a href="/category" class="nav-item active"><i>🏠</i><span>메인</span></a>
+    <a href="/category" class="nav-item"><i>🏠</i><span>메인</span></a>
+    <a href="/titles" class="nav-item"><i>🎖️</i><span>칭호도감</span></a>
     <a href="/mypage" class="nav-item"><i>👤</i><span>마이페이지</span></a>
 </nav>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const currPath = window.location.pathname;
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+
+            if (item.getAttribute('href') === currPath) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', fetchCategories);
