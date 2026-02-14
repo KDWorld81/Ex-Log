@@ -19,7 +19,7 @@ public class MyPageController {
 
     @GetMapping
     public ResponseEntity<MyPageResDto> getMyPage(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        MyPageResDto res = myPageService.getMyPage(customUserDetails.getUser());
+        MyPageResDto res = myPageService.getMyPage(customUserDetails.getUserId());
         return ResponseEntity.ok(res);
 
     }

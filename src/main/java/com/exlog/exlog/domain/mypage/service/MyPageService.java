@@ -2,12 +2,16 @@ package com.exlog.exlog.domain.mypage.service;
 
 import com.exlog.exlog.domain.auth.entity.Tier;
 import com.exlog.exlog.domain.auth.entity.User;
+import com.exlog.exlog.domain.auth.repository.UserRepository;
 import com.exlog.exlog.domain.exercise.repository.ExerciseLogRepository;
 import com.exlog.exlog.domain.mypage.dto.MyPageResDto;
+import com.exlog.exlog.exception.CustomException;
+import com.exlog.exlog.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,12 +22,16 @@ import java.util.List;
 public class MyPageService {
 
     private final ExerciseLogRepository exerciseLogRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public MyPageResDto getMyPage(User user) {
+    public MyPageResDto getMyPage(Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         List<LocalDate> grassData = exerciseLogRepository.findExerciseDatesByUser(user)
                 .stream()
-                .map(date -> date.toLocalDate())
+                .map(Date::toLocalDate)
                 .toList();
 
         LocalDateTime start = LocalDate.now().atStartOfDay();
