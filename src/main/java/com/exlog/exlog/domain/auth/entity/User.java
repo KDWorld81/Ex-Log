@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Builder
@@ -53,5 +55,17 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_title_id")
     private Title mainTitle;
+
+    private LocalDate lastReceiveExp; // 최근 exp 증가 날짜 (exp 무한 증가 방지)
+
+    public boolean canReceiveExp() {
+        return this.lastReceiveExp == null || !this.lastReceiveExp.equals(LocalDate.now()); // 마지막 Exp 받은 날이 당일이 아닐때만 획득 가능
+    }
+
+    public void addExp(int amount) {
+        this.totalExp += amount;
+        this.lastReceiveExp = LocalDate.now();
+        this.tier = Tier.getTierByExp(this.totalExp);
+    }
 
 }

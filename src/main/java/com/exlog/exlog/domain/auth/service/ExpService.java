@@ -1,53 +1,41 @@
-package com.exlog.exlog.domain.mypage.service;
+package com.exlog.exlog.domain.auth.service;
 
-import com.exlog.exlog.domain.auth.entity.Tier;
 import com.exlog.exlog.domain.auth.entity.User;
 import com.exlog.exlog.domain.auth.repository.UserRepository;
 import com.exlog.exlog.domain.exercise.repository.ExerciseLogRepository;
-import com.exlog.exlog.domain.mypage.dto.MyPageResDto;
 import com.exlog.exlog.exception.CustomException;
 import com.exlog.exlog.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MyPageService {
+@Transactional(readOnly = true)
+public class ExpService {
 
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public MyPageResDto getMyPage(Long userId) {
+    @Transactional
+    public void updateExp(Long userId){
 
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<LocalDate> grassData = exerciseLogRepository.findExerciseDatesByUser(user)
-                .stream()
-                .map(Date::toLocalDate)
-                .toList();
+        if(!user.canReceiveExp()){
+            return;
+        }
 
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
-
         Long todayExerciseCount = exerciseLogRepository.countDistinctExerciseByUserIdAndDate(user,start,end);
 
-        Tier currentTier = Tier.getTierByExp(user.getTotalExp());
-        Long remainingExp = calculateRemaining(currentTier, user.getTotalExp());
-
-        return MyPageResDto.fromEntity(user,remainingExp,todayExerciseCount,grassData);
-    }
-
-    private Long calculateRemaining(Tier currentTier, Long currentExp) {
-        Tier nextTier = currentTier.getNextTier();
-        if (nextTier == null) {return 0L;} // 챌린저는 남은 EXP 0
-        return Math.max(0, nextTier.getMinExp() - currentExp);
+        if(todayExerciseCount >= 3){
+            user.addExp(5);
+        }
     }
 }
