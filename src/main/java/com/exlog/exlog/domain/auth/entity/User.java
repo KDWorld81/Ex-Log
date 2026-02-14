@@ -65,7 +65,7 @@ public class User {
     public void addExp(int amount) {
         this.totalExp += amount;
         this.lastReceiveExp = LocalDate.now();
+        this.tier = Tier.getTierByExp(this.totalExp);
     }
-
 
 }
