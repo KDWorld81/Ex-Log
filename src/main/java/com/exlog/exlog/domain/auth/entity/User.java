@@ -54,4 +54,9 @@ public class User {
     @JoinColumn(name = "main_title_id")
     private Title mainTitle;
 
+    public void addExp(int amount) {
+        this.totalExp += amount;
+    }
+
+
 }
