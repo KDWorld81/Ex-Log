@@ -1,6 +1,7 @@
 package com.exlog.exlog.domain.exercise.service;
 
 import com.exlog.exlog.domain.auth.entity.User;
+import com.exlog.exlog.domain.auth.service.ExpService;
 import com.exlog.exlog.domain.exercise.dto.ExerciseLogReqDto;
 import com.exlog.exlog.domain.exercise.entity.Category;
 import com.exlog.exlog.domain.exercise.entity.Exercise;
@@ -22,6 +23,7 @@ public class ExerciseLogService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserTitleService userTitleService;
+    private final ExpService expService;
 
     public Long exerciseLogging(User user, ExerciseLogReqDto exerciseLogReqDto) {
         // 해당 운동 종목이 존재하는가
@@ -46,6 +48,7 @@ public class ExerciseLogService {
         // 저장후 생성된 ID 반환
         ExerciseLog savedLog = exerciseLogRepository.save(exerciseLog);
 
+        expService.updateExp(user.getUserId());
         userTitleService.checkAndGrantTitles(user);
         return savedLog.getLogId();
 
