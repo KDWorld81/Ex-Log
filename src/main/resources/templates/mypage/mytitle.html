@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Ex-Log | 내 칭호 도감</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --bg-color: #f8f9fa;
@@ -13,14 +14,11 @@
             --title-purple: #9B59B6;
         }
         body { font-family: 'Pretendard', -apple-system, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; }
-
         .container { width: 100%; max-width: 480px; padding: 20px; min-height: 100vh; }
         .header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-top: 20px; }
         .back-btn { text-decoration: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
         h1 { font-size: 1.5rem; margin: 0; color: var(--text-main); }
-
         .title-grid { display: flex; flex-direction: column; gap: 16px; }
-
         .title-card {
             background: var(--card-bg);
             border-radius: 20px;
@@ -32,12 +30,20 @@
             border-left: 6px solid var(--title-purple);
             transition: transform 0.2s;
         }
-
         .title-icon { font-size: 2rem; }
         .title-info { flex: 1; }
         .name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 5px 0; }
         .desc { font-size: 0.85rem; color: var(--text-sub); line-height: 1.4; margin: 0; }
-
+        .select-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
         .empty-msg { text-align: center; padding: 100px 0; color: #aaa; font-size: 0.9rem; line-height: 1.6; }
     </style>
 </head>
@@ -48,31 +54,71 @@
         <a href="/mypage" class="back-btn">←</a>
         <h1>🏆 내 칭호 도감</h1>
     </div>
-
-    <div id="titleGrid" class="title-grid">
-        <p style="text-align:center; color:#ccc;">칭호를 불러오는 중...</p>
-    </div>
+    <div id="titleGrid" class="title-grid"></div>
 </div>
 
 <script>
+    function setMainTitle(id) {
+        if(!id) {
+            Swal.fire('에러', '칭호 정보를 가져오지 못했습니다.', 'error');
+            return;
+        }
+
+
+        Swal.fire({
+            title: '대표 칭호 설정',
+            text: "이 칭호를 대표 칭호로 설정할까요?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4A90E2',
+            cancelButtonColor: '#868e96',
+            confirmButtonText: '확인',
+            cancelButtonText: '취소',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                executeSelection(id);
+            }
+        });
+    }
+
+    function executeSelection(id) {
+        fetch('/api/v1/maintitle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titleId: id })
+        })
+            .then(res => {
+                if (res.ok) {
+                    Swal.fire({
+                        title: '성공!',
+                        text: '대표 칭호가 변경되었습니다.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('실패', '변경 중 오류가 발생했습니다.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire('에러', '네트워크 연결을 확인해주세요.', 'error');
+            });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        // 백엔드 API 호출
         fetch('/api/v1/title/library')
             .then(res => res.json())
             .then(data => {
                 const grid = document.getElementById('titleGrid');
-                grid.innerHTML = ''; // 로딩 문구 제거
+                grid.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-msg">
-                            아직 획득한 칭호가 없습니다.<br>
-                            열심히 운동해서 도감을 채워보세요! 💪
-                        </div>`;
+                    grid.innerHTML = '<div class="empty-msg">아직 획득한 칭호가 없습니다.</div>';
                     return;
                 }
 
-                // 획득한 칭호 목록 렌더링
                 data.forEach(title => {
                     grid.innerHTML += `
                         <div class="title-card">
@@ -81,14 +127,13 @@
                                 <p class="name">${title.titleName}</p>
                                 <p class="desc">${title.explanation}</p>
                             </div>
+                            <button class="select-btn" onclick="setMainTitle(${title.titleId})">선택</button>
                         </div>
                     `;
                 });
             })
             .catch(err => {
-                console.error('API 호출 에러:', err);
-                document.getElementById('titleGrid').innerHTML =
-                    '<p style="text-align:center; color:red;">데이터를 불러오지 못했습니다. 다시 시도해주세요.</p>';
+                document.getElementById('titleGrid').innerHTML = '<p style="text-align:center;">데이터를 불러오지 못했습니다.</p>';
             });
     });
 </script>
