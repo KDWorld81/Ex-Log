@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Ex-Log Exercise Recording</title>
+    <title>Ex-Log | 운동 기록</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-color: #4A90E2;
@@ -135,7 +136,12 @@
         const valBottom = document.getElementById('input-bottom').value;
 
         if (!valTop || !valBottom) {
-            alert("모든 항목을 입력해주세요!");
+            Swal.fire({
+                icon: 'warning',
+                title: '입력 확인',
+                text: '모든 항목을 입력해주세요!',
+                confirmButtonColor: '#4A90E2'
+            });
             return;
         }
 
@@ -157,14 +163,32 @@
             });
 
             if (response.ok) {
-                alert("성공적으로 기록되었습니다! 💪");
-                location.href = `/exercise/${categoryId}`;
+                Swal.fire({
+                    icon: 'success',
+                    title: '기록 완료! 💪',
+                    text: '오늘의 운동이 성공적으로 저장되었습니다.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.href = `/exercise/${categoryId}`;
+                });
             } else {
                 const errorData = await response.json();
-                alert(errorData.message || "저장 실패");
+                Swal.fire({
+                    icon: 'error',
+                    title: '저장 실패',
+                    text: errorData.message || '알 수 없는 에러가 발생했습니다.',
+                    confirmButtonColor: '#4A90E2'
+                });
             }
         } catch (error) {
             console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: '네트워크 에러',
+                text: '서버와 연결할 수 없습니다.',
+                confirmButtonColor: '#4A90E2'
+            });
         }
     }
 </script>
