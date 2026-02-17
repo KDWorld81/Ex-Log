@@ -68,4 +68,8 @@ public class User {
         this.tier = Tier.getTierByExp(this.totalExp);
     }
 
+    public void updateMainTitle(Title mainTitle) {
+        this.mainTitle = mainTitle;
+    }
+
 }
