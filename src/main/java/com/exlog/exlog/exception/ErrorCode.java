@@ -31,7 +31,8 @@ public enum ErrorCode {
     INVALID_INPUT_REPS_SETS(400,"근력운동은 세트와 횟수 필수 입력 입니다."),
 
     // Title (칭호)
-    TITLE_NOT_FOUND(404, "존재하지 않는 칭호입니다.");
+    TITLE_NOT_FOUND(404, "존재하지 않는 칭호입니다."),
+    TITLE_NOT_OWNED(404, "획득하지 않은 칭호입니다.");
 
     private final int status;
     private final String message;
