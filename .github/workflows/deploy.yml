@@ -50,4 +50,4 @@ jobs:
             docker-compose down
             docker-compose up -d
             docker image prune -f
-          #테스트7
+          #최종테스트
