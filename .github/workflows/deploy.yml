@@ -2,7 +2,7 @@ name: Deploy Ex-Log App to EC2
 
 on:
   push:
-    branches: [ "chore/deploy" ]
+    branches: [ "dev" ]
 
 jobs:
   build-and-deploy:
@@ -34,7 +34,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: . # 최상단 경로에서 빌드
+          context: .
           push: true
           tags: kdworld/ex-log-app:latest
 
