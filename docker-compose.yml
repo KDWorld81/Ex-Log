@@ -16,11 +16,11 @@ services:
       - JWT_ISSUER=${JWT_ISSUER}
       - SPRING_PROFILES_ACTIVE=prod
     depends_on:
-      - db
+      - ex-log-db
     networks:
       - ex-log-network
 
-  db:
+  ex-log-db:
     image: mysql:8.0
     container_name: ex-log-db
     environment:
