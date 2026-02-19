@@ -2,7 +2,7 @@ name: Deploy Ex-Log App to EC2
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "chore/deploy" ]
 
 jobs:
   build-and-deploy:
