@@ -45,9 +45,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script:
-            cd /home/ubuntu 
+            cd "/home/ubuntu" 
             docker pull kdworld/ex-log-app:latest
             docker-compose down
             docker-compose up -d
             docker image prune -f
-          #테스트4
+          #테스트5
