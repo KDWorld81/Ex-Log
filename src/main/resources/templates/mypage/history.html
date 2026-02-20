@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise History</title>
+    <style>
+        :root { --primary-color: #4A90E2; --bg-color: #f8f9fa; --card-bg: #ffffff; --text-color: #333; --sub-text: #888; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; background: var(--bg-color); min-height: 100vh; padding: 20px 20px 100px; }
+        .header { display: flex; align-items: center; margin-bottom: 24px; position: sticky; top: 0; background: var(--bg-color); padding: 10px 0; z-index: 10; }
+        .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-right: 12px; }
+        h2 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+        .history-list { display: flex; flex-direction: column; gap: 16px; min-height: 300px; }
+        .history-card { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .exercise-name { font-size: 1.1rem; font-weight: 700; color: var(--text-color); }
+        .date { font-size: 0.85rem; color: var(--sub-text); }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #fcfcfc; padding: 12px; border-radius: 12px; }
+        .stat-item { font-size: 0.9rem; color: #555; }
+        .stat-label { color: var(--sub-text); font-size: 0.8rem; margin-right: 4px; }
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 30px; flex-wrap: wrap; }
+        .page-btn { padding: 8px 14px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600; color: #666; transition: all 0.2s; }
+        .page-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .page-btn:hover:not(.active) { background: #f0f0f0; }
+        .empty-msg { text-align: center; padding: 50px 0; color: var(--sub-text); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="location.href='/mypage'">←</button>
+        <h2>운동 히스토리 (최근 45일)</h2>
+    </div>
+    <div id="history-list" class="history-list"></div>
+    <div id="pagination" class="pagination"></div>
+</div>
+
+<script>
+    const historyList = document.getElementById('history-list');
+    const paginationContainer = document.getElementById('pagination');
+
+    async function loadHistory(page = 0) {
+        try {
+            const response = await fetch(`/api/v1/loghistory?page=${page}&size=10`);
+            const data = await response.json();
+
+            historyList.innerHTML = '';
+
+            if (data.content.length === 0) {
+                historyList.innerHTML = '<div class="empty-msg">최근 45일간 운동 기록이 없습니다.</div>';
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            data.content.forEach(log => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+
+                const date = new Date(log.createAt);
+                const dateStr = `${date.getMonth() + 1}월 ${date.getDate()}일 ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+                let statsHtml = '';
+                if (log.sets !== null) statsHtml += `<div class="stat-item"><span class="stat-label">세트:</span>${log.sets}</div>`;
+                if (log.reps !== null) statsHtml += `<div class="stat-item"><span class="stat-label">횟수:</span>${log.reps}</div>`;
+                if (log.minutes !== null) statsHtml += `<div class="stat-item"><span class="stat-label">시간:</span>${log.minutes}분</div>`;
+                if (log.distance !== null) statsHtml += `<div class="stat-item"><span class="stat-label">거리:</span>${log.distance}km</div>`;
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="exercise-name">${log.exerciseName}</span>
+                        <span class="date">${dateStr}</span>
+                    </div>
+                    <div class="stats-grid">${statsHtml || '<div class="stat-item">기록 상세 정보 없음</div>'}</div>
+                `;
+                historyList.appendChild(card);
+            });
+
+            renderPagination(data.totalPages, data.number);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (error) {
+            console.error("Fetch Error:", error);
+        }
+    }
+
+    function renderPagination(totalPages, currentPage) {
+        paginationContainer.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        for (let i = 0; i < totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+            btn.textContent = i + 1;
+            btn.onclick = () => loadHistory(i);
+            paginationContainer.appendChild(btn);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => loadHistory(0));
+</script>
+</body>
+</html>

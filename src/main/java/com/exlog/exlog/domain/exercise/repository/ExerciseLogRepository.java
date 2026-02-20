@@ -3,11 +3,12 @@ package com.exlog.exlog.domain.exercise.repository;
 import com.exlog.exlog.domain.auth.entity.User;
 import com.exlog.exlog.domain.exercise.entity.Category;
 import com.exlog.exlog.domain.exercise.entity.ExerciseLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,8 +28,5 @@ public interface ExerciseLogRepository extends JpaRepository<ExerciseLog, Long> 
     @Query("SELECT el.createAt FROM ExerciseLog el " + "WHERE el.user.userId = :userId AND el.category.categoryId = :categoryId")
     List<LocalDateTime> findAllCreateAtByUserIdAndCategoryId(@Param("userId") Long userId, @Param("categoryId") Long categoryId); // 운동 일시 조회 (빈도수)
 
-    @Query("SELECT DISTINCT CAST(e.createAt AS date) FROM ExerciseLog e " + "WHERE e.user.userId = :userId ORDER BY CAST(e.createAt AS date) DESC")
-    List<LocalDate> findDistinctWorkoutDates(@Param("userId") Long userId); // 운동을 몇일간 연속으로 했는지 조회
-
-
+    Page<ExerciseLog> findAllByUserAndCreateAtAfterOrderByCreateAtDesc(User user, LocalDateTime startDateTime, Pageable pageable); // 내 운동기록 조회
 }
