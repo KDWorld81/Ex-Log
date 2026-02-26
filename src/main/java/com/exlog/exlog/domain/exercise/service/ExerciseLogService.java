@@ -50,6 +50,8 @@ public class ExerciseLogService {
 
         expService.updateExp(user.getUserId());
         userTitleService.checkAndGrantTitles(user);
+        user.updateLastExerciseDate();
+
         return savedLog.getLogId();
 
     }
