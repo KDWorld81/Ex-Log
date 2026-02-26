@@ -56,6 +56,8 @@ public class User {
     @JoinColumn(name = "main_title_id")
     private Title mainTitle;
 
+    private LocalDate lastExerciseDate; // 마지막 운동 일
+
     private LocalDate lastReceiveExp; // 최근 exp 증가 날짜 (exp 무한 증가 방지)
 
     public boolean canReceiveExp() {
@@ -72,4 +74,7 @@ public class User {
         this.mainTitle = mainTitle;
     }
 
+    public void updateLastExerciseDate() {
+        this.lastExerciseDate = LocalDate.now();
+    }
 }
