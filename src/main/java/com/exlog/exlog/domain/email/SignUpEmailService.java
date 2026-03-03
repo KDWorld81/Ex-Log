@@ -51,7 +51,7 @@ public class SignUpEmailService {
         if (savedCode == null || !savedCode.equals(inputCode)) {
             return false;
         }
-
+        stringRedisTemplate.opsForValue().set("VERIFIED_EMAIL:" + email, "DONE", 10, TimeUnit.MINUTES);
         // 인증 성공 시 데이터 삭제 (중복 사용 방지)
         stringRedisTemplate.delete("EMAIL_AUTH:" + email);
         return true;
