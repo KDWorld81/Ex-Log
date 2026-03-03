@@ -4,6 +4,7 @@ import com.exlog.exlog.domain.auth.dto.LoginReqDto;
 import com.exlog.exlog.domain.auth.dto.LoginResDto;
 import com.exlog.exlog.domain.auth.dto.SignupReqDto;
 import com.exlog.exlog.domain.auth.service.AuthService;
+import com.exlog.exlog.domain.email.SignUpEmailService;
 import com.exlog.exlog.security.jwt.CookieUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,30 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final SignUpEmailService signUpEmailService;
 
     // 회원가입 API
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody SignupReqDto signupReqDto) {
         authService.signUp(signupReqDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
+    }
+
+    // 인증번호 발송
+    @PostMapping("/send")
+    public ResponseEntity<String> sendCode(@RequestParam String email) {
+        signUpEmailService.sendVerificationCode(email);
+        return ResponseEntity.ok("인증 번호가 발송되었습니다.");
+    }
+
+    // 인증번호 검증
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
+        boolean isVerified = signUpEmailService.verifyCode(email, code);
+        if (isVerified) {
+            return ResponseEntity.ok("인증 성공!");
+        }
+        return ResponseEntity.badRequest().body("인증 번호가 틀렸거나 만료되었습니다.");
     }
 
     // 로그인 API

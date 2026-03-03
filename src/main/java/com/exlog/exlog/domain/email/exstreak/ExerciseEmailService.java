@@ -1,4 +1,4 @@
-package com.exlog.exlog.domain.email;
+package com.exlog.exlog.domain.email.exstreak;
 
 
 import com.exlog.exlog.domain.auth.entity.User;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class ExerciseEmailService {
 
     private final JavaMailSender javaMailSender;
 

@@ -9,6 +9,7 @@ public enum ErrorCode {
 
     // 회원가입
     DUPLICATE_EMAIL(409 , "이미 존재하는 회원(이메일) 입니다."),
+    EMAIL_NOT_VERIFIED(409, "미인증 이메일 입니다."),
 
     // 로그인
     USER_NOT_FOUND(404, "존재하지 않는 회원입니다."),
