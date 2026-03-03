@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class ExerciseEmailService {
 
     private final JavaMailSender javaMailSender;
 
