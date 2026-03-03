@@ -1,4 +1,4 @@
-package com.exlog.exlog.domain.email;
+package com.exlog.exlog.domain.email.exstreak;
 
 
 import com.exlog.exlog.domain.auth.entity.User;
