@@ -2,6 +2,7 @@ services:
   # 1. 스프링 부트 애플리케이션 서비스
   ex-log-app:
     image: kdworld/ex-log-app:latest
+    platform: linux/amd64
     container_name: ex-log-app
     ports:
       - "8080:8080"
