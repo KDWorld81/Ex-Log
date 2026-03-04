@@ -1,40 +1,33 @@
-version: '3.8'
-
 services:
+  # 1. 스프링 부트 애플리케이션 서비스
   ex-log-app:
-    build: .
+    image: kdworld/ex-log-app:latest
     container_name: ex-log-app
     ports:
       - "8080:8080"
-    environment:
-      # .env 파일에 적힌 값을 컨테이너 내부로 토스
-      - DB_HOST=ex-log-db
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - .env
     depends_on:
       - ex-log-db
-    networks:
-      - ex-log-network
+      - exlog-redis
+    restart: always
 
+  # 2. MySQL 데이터베이스 서비스
   ex-log-db:
     image: mysql:8.0
     container_name: ex-log-db
-    environment:
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
     ports:
       - "3306:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
-    networks:
-      - ex-log-network
+    restart: always
 
-networks:
-  ex-log-network:
-    driver: bridge
+  # 3. Redis 캐시 서비스
+  exlog-redis:
+    image: redis:latest
+    container_name: exlog-redis
+    ports:
+      - "6379:6379"
+    restart: always
