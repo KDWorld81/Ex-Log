@@ -1,6 +1,7 @@
 package com.exlog.exlog.domain.exercise.service;
 
 import com.exlog.exlog.domain.auth.entity.User;
+import com.exlog.exlog.domain.auth.repository.UserRepository;
 import com.exlog.exlog.domain.auth.service.ExpService;
 import com.exlog.exlog.domain.exercise.dto.ExerciseLogReqDto;
 import com.exlog.exlog.domain.exercise.entity.Category;
@@ -22,11 +23,15 @@ public class ExerciseLogService {
 
     private final ExerciseRepository exerciseRepository;
     private final ExerciseLogRepository exerciseLogRepository;
+    private final UserRepository userRepository;
     private final UserTitleService userTitleService;
     private final ExpService expService;
 
-    public Long exerciseLogging(User user, ExerciseLogReqDto exerciseLogReqDto) {
-        // 해당 운동 종목이 존재하는가
+    public Long exerciseLogging(Long userId, ExerciseLogReqDto exerciseLogReqDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Exercise exercise = exerciseRepository.findById(exerciseLogReqDto.getExerciseId())
                 .orElseThrow(() -> new CustomException(ErrorCode.EXERCISE_NOT_FOUND));
 
