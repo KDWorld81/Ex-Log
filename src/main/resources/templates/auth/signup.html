@@ -17,12 +17,16 @@
         .input-group { display: flex; gap: 8px; }
         .input-group input { flex: 1; }
         .input-group button { margin-top: 0; width: auto; white-space: nowrap; font-size: 13px; padding: 10px; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; }
-        button { padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+        button { padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.2s; }
         button:hover { background-color: #0069d9; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        .error-msg { color: #dc3545; font-size: 12px; margin-top: -8px; display: none; }
-        .success-msg { color: #28a745; font-size: 12px; margin-top: -8px; display: none; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+
+        .error-msg { color: #dc3545; font-size: 12px; margin-top: -8px; display: none; text-align: left; animation: fadeIn 0.3s; }
+        .success-msg { color: #28a745; font-size: 12px; margin-top: -8px; display: none; text-align: left; }
+        input.invalid { border-color: #dc3545; background-color: #fff8f8; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .link { text-align: center; margin-top: 15px; font-size: 13px; }
     </style>
 </head>
@@ -30,46 +34,88 @@
 <div class="container">
     <h2>Ex-Log 회원가입</h2>
     <div class="form-group">
+
         <div class="input-group">
-            <input type="email" id="email" placeholder="이메일 (ID)">
+            <input type="email" id="email" placeholder="이메일 (ID)" onblur="validateEmail()">
             <button id="send-btn" onclick="sendEmail()">인증 요청</button>
         </div>
         <div id="email-error" class="error-msg"></div>
+
         <div class="input-group" id="auth-section" style="display: none;">
             <input type="text" id="authCode" placeholder="인증 번호 6자리">
             <button id="verify-btn" onclick="verifyEmail()">확인</button>
         </div>
         <div id="auth-msg" class="success-msg">인증되었습니다!</div>
-        <input type="password" id="password" placeholder="비밀번호">
+
+        <!-- 비밀번호 및 정보 입력 -->
+        <input type="password" id="password" placeholder="비밀번호 (8자 이상)" onblur="validatePassword()">
         <div id="password-error" class="error-msg"></div>
+
         <input type="text" id="username" placeholder="이름 (닉네임)">
         <div id="username-error" class="error-msg"></div>
+
         <select id="gender">
             <option value="">성별 선택</option>
             <option value="MALE">남성</option>
             <option value="FEMALE">여성</option>
         </select>
         <div id="gender-error" class="error-msg"></div>
+
         <button onclick="handleSignup()" id="signup-btn" disabled>가입하기</button>
     </div>
     <div class="link"><a href="/login">이미 계정이 있나요? 로그인</a></div>
 </div>
+
 <script>
     let isEmailVerified = false;
+
+    function validateEmail() {
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email.length > 0 && !emailRegex.test(email)) {
+            showError('email', '올바른 이메일 형식이 아닙니다.');
+            return false;
+        } else {
+            hideError('email');
+            return true;
+        }
+    }
+
+    function validatePassword() {
+        const password = document.getElementById('password').value;
+        if (password.length > 0 && password.length < 8) {
+            showError('password', '비밀번호는 최소 8자 이상이어야 합니다.');
+            return false;
+        } else {
+            hideError('password');
+            return true;
+        }
+    }
+
     async function sendEmail() {
         const email = document.getElementById('email').value;
-        if (!email) return alert("이메일을 입력해주세요.");
+        if (!validateEmail() || !email) return alert("올바른 이메일을 입력해주세요.");
+
+        resetErrors();
+        const sendBtn = document.getElementById('send-btn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = '발송 중...';
+
         try {
             const response = await fetch(`/api/v1/auth/send?email=${email}`, { method: 'POST' });
             if (response.ok) {
                 alert("인증 번호가 메일로 전송되었습니다.");
                 document.getElementById('auth-section').style.display = 'flex';
-                document.getElementById('send-btn').textContent = '재전송';
+                sendBtn.textContent = '재전송';
             } else {
-                alert("메일 발송에 실패했습니다.");
+                const errorData = await response.json();
+                showError('email', errorData.message || "메일 발송 실패");
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { alert("서버 연결 실패"); }
+        finally { sendBtn.disabled = false; }
     }
+
     async function verifyEmail() {
         const email = document.getElementById('email').value;
         const code = document.getElementById('authCode').value;
@@ -88,28 +134,67 @@
             }
         } catch (e) { console.error(e); }
     }
+
     async function handleSignup() {
         if (!isEmailVerified) return alert("이메일 인증을 먼저 완료해주세요.");
+        if (!validateEmail() || !validatePassword()) return;
+
+        const signupBtn = document.getElementById('signup-btn');
+        signupBtn.disabled = true;
+
+        resetErrors();
         const signupData = {
             email: document.getElementById('email').value,
             password: document.getElementById('password').value,
             username: document.getElementById('username').value,
             gender: document.getElementById('gender').value
         };
+
         try {
             const response = await fetch('/api/v1/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(signupData)
             });
+
             if (response.ok) {
                 alert("회원가입이 완료되었습니다!");
                 window.location.href = '/login';
             } else {
                 const errorData = await response.json();
-                alert(errorData.message || "회원가입 실패");
+                if (typeof errorData === 'object' && !errorData.message) {
+                    Object.keys(errorData).forEach((field, index) => {
+                        showError(field, errorData[field]);
+                        if (index === 0) document.getElementById(field).focus();
+                    });
+                } else {
+                    alert(errorData.message || "회원가입 실패");
+                }
             }
         } catch (e) { alert("서버 통신 에러"); }
+        finally { signupBtn.disabled = false; }
+    }
+
+    function showError(field, message) {
+        const errorElement = document.getElementById(`${field}-error`);
+        const inputElement = document.getElementById(field);
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        if (inputElement) inputElement.classList.add('invalid');
+    }
+
+    function hideError(field) {
+        const errorElement = document.getElementById(`${field}-error`);
+        const inputElement = document.getElementById(field);
+        if (errorElement) errorElement.style.display = 'none';
+        if (inputElement) inputElement.classList.remove('invalid');
+    }
+
+    function resetErrors() {
+        document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('input, select').forEach(el => el.classList.remove('invalid'));
     }
 </script>
 </body>
