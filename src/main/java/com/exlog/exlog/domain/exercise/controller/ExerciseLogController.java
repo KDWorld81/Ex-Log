@@ -27,7 +27,7 @@ public class ExerciseLogController {
     ) {
 
         Long savedLogId = exerciseLogService.exerciseLogging(
-                customUserDetails.getUser(),
+                customUserDetails.getUserId(),
                 exerciseLogReqDto
         );
 
