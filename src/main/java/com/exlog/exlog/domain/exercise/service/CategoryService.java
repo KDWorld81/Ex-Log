@@ -16,6 +16,12 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    /**
+     * 전체 운동 카테고리 목록 조회
+     * 등록된 모든 운동 카테고리를 엔티티에서 DTO 리스트로 변환하여 반환
+     *
+     * @return 운동 카테고리 DTO 리스트
+     */
     public List<CategoryResDto> findAllCategories() {
         return categoryRepository.findAll().stream()
                 .map(CategoryResDto::fromEntity)

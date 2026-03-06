@@ -21,6 +21,13 @@ public class ExpService {
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 오늘 운동 횟수에 따른 경험치 지급
+     * 당일 고유 운동 기록이 3개 이상일 경우 5 EXP를 부여
+     *
+     * @param userId 경험치를 업데이트할 사용자 ID
+     * @throws CustomException 사용자를 찾을 수 없을 경우 발생
+     */
     @Transactional
     public void updateExp(Long userId){
 

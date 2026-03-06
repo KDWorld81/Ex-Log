@@ -21,6 +21,14 @@ public class MainTitleService {
     private final TitleRepository titleRepository;
     private final UserTitleRepository userTitleRepository;
 
+    /**
+     * 사용자의 대표 칭호 변경
+     * 보유 중인 칭호인지 확인 후 유저 정보에 대표 칭호로 업데이트
+     *
+     * @param userId 사용자 식별자
+     * @param mainTitleReqDto 변경할 칭호 정보 (titleId)
+     * @throws CustomException 사용자가 없거나, 해당 칭호를 보유하지 않은 경우 발생
+     */
     @Transactional
     public void selectMainTitle(Long userId, MainTitleReqDto mainTitleReqDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
