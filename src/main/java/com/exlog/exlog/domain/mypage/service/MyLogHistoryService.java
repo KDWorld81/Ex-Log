@@ -24,6 +24,15 @@ public class MyLogHistoryService {
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 사용자의 최근 운동 이력 페이징 조회
+     * 현재 날짜 기준 45일 전부터의 기록을 최신순으로 조회하여 반환
+     *
+     * @param userId 조회 대상 사용자 ID
+     * @param pageable 페이징 및 정렬 정보
+     * @return 운동 이력 DTO 페이징 결과
+     * @throws CustomException 사용자를 찾을 수 없을 경우 발생 (USER_NOT_FOUND)
+     */
     public Page<MyLogHistoryResDto> getAllHistory(Long userId, Pageable pageable) {
 
         User user = userRepository.findById(userId)

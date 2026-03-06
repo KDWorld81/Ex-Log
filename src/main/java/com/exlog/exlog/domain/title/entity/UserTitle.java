@@ -45,4 +45,10 @@ public class UserTitle {
     @Column(name = "acquired_at", nullable = false)
     private LocalDateTime acquiredAt;
 
+    public static UserTitle create(User user, Title title) {
+        return UserTitle.builder()
+                .user(user)
+                .title(title)
+                .build();
+    }
 }

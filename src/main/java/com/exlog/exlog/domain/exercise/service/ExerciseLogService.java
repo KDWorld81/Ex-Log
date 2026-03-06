@@ -27,6 +27,16 @@ public class ExerciseLogService {
     private final UserTitleService userTitleService;
     private final ExpService expService;
 
+    /**
+     * 사용자의 운동 기록을 저장하고 관련 보상(EXP, 칭호)을 처리합니다.
+     * 카테고리(유산소/무산소)에 따라 입력값(시간/거리 또는 횟수/세트)의 유효성을 검증
+     *
+     * @param userId 운동을 기록하는 사용자 ID
+     * @param exerciseLogReqDto 운동 상세 정보 (종목 ID, 횟수, 세트, 시간, 거리 등)
+     * @return 생성된 운동 기록의 식별자(ID)
+     * @throws CustomException 사용자/종목 미존재 시, 또는 카테고리별 필수 입력값이 누락되었을 경우 발생
+     */
+
     public Long exerciseLogging(Long userId, ExerciseLogReqDto exerciseLogReqDto) {
 
         User user = userRepository.findById(userId)

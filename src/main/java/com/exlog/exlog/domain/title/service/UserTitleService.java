@@ -26,7 +26,9 @@ public class UserTitleService {
     private final ExerciseLogRepository exerciseLogRepository;
 
     /**
-     *  칭호 획득 체크 로직
+     * 미획득 칭호의 달성 조건 충족 여부를 확인하고 칭호를 부여
+     *
+     * @param user 대상 사용자 엔티티
      */
     @Transactional
     public void checkAndGrantTitles(User user) {
@@ -42,7 +44,10 @@ public class UserTitleService {
     }
 
     /**
-     *  나의 칭호 조회 로직
+     * 현재 사용자가 획득한 칭호 목록 조회
+     *
+     * @param userId 사용자 식별자
+     * @return 획득한 칭호 정보 리스트
      */
     public List<UserTitleResDto> getMyTitles(Long userId) {
         return userTitleRepository.findAllByUser_UserId(userId).stream()
@@ -50,6 +55,13 @@ public class UserTitleService {
                 .toList();
     }
 
+    /**
+     **
+     * 칭호 조건에 따른 현재 진행 수치 계산
+     * @param user 대상 사용자
+     * @param title 확인할 칭호 정보
+     * @return 계산된 진척도 수치
+     */
     private long calculateProgress(User user, Title title) {
         return switch (title.getTitleCondition()) {
 
@@ -72,6 +84,11 @@ public class UserTitleService {
         };
     }
 
+    /**
+     * 현재 연속 운동 일수(Streak) 계산
+     * @param user 대상 사용자
+     * @return 현재 유지 중인 연속 일수
+     */
     private long calculateCurrentStreak(User user) {
         // findExerciseDatesByUser는 List<java.sql.Date>를 반환하므로 변환 필요
         List<java.sql.Date> sqlDates = exerciseLogRepository.findExerciseDatesByUser(user);
@@ -95,8 +112,13 @@ public class UserTitleService {
         return streak;
     }
 
+    /**
+     * 칭호 부여 처리 (UserTitle 저장)
+     * @param user 칭호를 받을 사용자
+     * @param title 부여할 칭호
+     */
     private void grantTitle(User user, Title title) {
-        userTitleRepository.save(UserTitle.builder().user(user).title(title).build());
+        userTitleRepository.save(UserTitle.create(user, title));
     }
 
 }
