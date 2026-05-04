@@ -114,4 +114,19 @@ public class JwtProvider {
             return true; // 예외 발생 시 만료된 것으로 간주
         }
     }
+
+    /**
+     * 토큰의 남은 유효 시간을 밀리초 단위로 리턴합니다.
+     *
+     * @param token : 유효 시간을 확인할 토큰
+     * @return : 남은 유효 시간 (ms)
+     */
+    public Long getExpiration(String token) {
+        // 토큰의 만료 날짜를 가져옴
+        Date expiration = parseClaims(token).getExpiration();
+        // 현재 시간
+        long now = new Date().getTime();
+        // 남은 시간 계산
+        return (expiration.getTime() - now);
+    }
 }

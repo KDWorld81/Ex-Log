@@ -6,12 +6,17 @@ import com.exlog.exlog.domain.auth.dto.SignupReqDto;
 import com.exlog.exlog.domain.auth.service.AuthService;
 import com.exlog.exlog.domain.email.SignUpEmailService;
 import com.exlog.exlog.security.jwt.CookieUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -58,5 +63,32 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(loginRes);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 1. 요청의 쿠키에서 토큰 꺼내기
+        String token = null;
+        if (request.getCookies() != null) {
+            token = Arrays.stream(request.getCookies())
+                    .filter(c -> "accessToken".equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (token != null) {
+            // 2. 서비스 로직 실행 (DB 리프레시 토큰 삭제 + 레디스 블랙리스트 등록)
+            authService.logout(token);
+
+            // 3. 클라이언트 쿠키 삭제 (Max-Age를 0으로 설정)
+            Cookie cookie = new Cookie("accessToken", null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true); // 보안 설정 유지
+            response.addCookie(cookie);
+        }
+
+        return ResponseEntity.ok("성공적으로 로그아웃되었습니다.");
     }
 }
