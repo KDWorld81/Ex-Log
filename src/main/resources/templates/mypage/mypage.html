@@ -72,7 +72,7 @@
     </div>
 
     <div class="button-group">
-        <button id="logout-btn" class="nav-btn logout-btn">
+        <button id="logout-btn" type="button" class="nav-btn logout-btn">
             <span>🚪 시스템 로그아웃</span>
             <span class="btn-icon">→</span>
         </button>
@@ -86,19 +86,13 @@
 </nav>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const currPath = window.location.pathname;
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
-            if (item.getAttribute('href') === currPath) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
+            item.classList.toggle('active', item.getAttribute('href') === currPath);
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch('/api/v1/mypage');
             const data = await response.json();
@@ -113,21 +107,15 @@
             document.getElementById('exp-text').textContent = `다음 티어까지 ${remaining} XP 남음`;
             const todayCount = data.todayExerciseCount || 0;
             document.getElementById('challenge-count').textContent = `${todayCount} / 3 완료`;
-            if (todayCount >= 3) {
-                document.getElementById('challenge-desc').textContent = '✅ 오늘의 챌린지 성공! +5 XP 획득';
-            } else {
-                document.getElementById('challenge-desc').textContent = `오늘 ${3 - todayCount}종목 더 하면 경험치 +5 XP!`;
-            }
+            document.getElementById('challenge-desc').textContent = todayCount >= 3 ? '✅ 오늘의 챌린지 성공! +5 XP 획득' : `오늘 ${3 - todayCount}종목 더 하면 경험치 +5 XP!`;
+
             const container = document.getElementById('grass-container');
             container.innerHTML = '';
             const grassDates = data.grassData || [];
             for (let i = 44; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const dateStr = `${year}-${month}-${day}`;
+                const dateStr = date.toISOString().split('T')[0];
                 const cell = document.createElement('div');
                 cell.className = 'cell' + (grassDates.includes(dateStr) ? ' active' : '');
                 container.appendChild(cell);
@@ -136,21 +124,25 @@
             document.getElementById('user-name').textContent = '로그인 필요';
         }
 
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            if (!confirm('정말 로그아웃 하시겠습니까?')) return;
-            try {
-                const response = await fetch('/api/v1/auth/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                if (response.ok) {
-                    alert('로그아웃 되었습니다. 👋');
-                    window.location.href = '/login';
-                } else {
-                    alert('로그아웃에 실패했습니다.');
+        document.getElementById('logout-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (confirm('정말 로그아웃 하시겠습니까?')) {
+                try {
+                    const response = await fetch('/api/v1/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        alert('로그아웃 되었습니다. 👋');
+                        window.location.href = '/login';
+                    } else {
+                        alert('로그아웃에 실패했습니다.');
+                    }
+                } catch (error) {
+                    alert('서버 통신 오류가 발생했습니다.');
                 }
-            } catch (error) {
-                alert('서버 통신 오류가 발생했습니다.');
             }
         });
     });
