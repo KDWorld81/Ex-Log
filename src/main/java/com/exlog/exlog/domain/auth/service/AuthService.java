@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -118,5 +120,26 @@ public class AuthService {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
         }
+    }
+
+    /**
+     * 사용자의 로그아웃 처리를 수행하는 메소드입니다.
+     * DB에서 리프레시 토큰을 삭제하고, 현재 엑세스 토큰을 블랙리스트에 등록합니다.
+     * DB 쓰기 작업이 있으므로 트랜잭션 처리를 추가합니다.
+     *
+     * @param accessToken 클라이언트로부터 전달받은 엑세스 토큰 문자열
+     */
+    @Transactional
+    public void logout(String accessToken) {
+        // 1. 토큰에서 유저 이메일 추출
+        String email = jwtProvider.getEmail(accessToken);
+
+        // 2. DB에서 해당 유저의 리프레시 토큰 엔티티 삭제
+        refreshTokenRepository.deleteByEmail(email);
+
+        // 3. 엑세스 토큰의 남은 시간을 계산해 레디스 블랙리스트 등록
+        long expiration = jwtProvider.getExpiration(accessToken);
+        redisTemplate.opsForValue()
+                .set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
     }
 }
