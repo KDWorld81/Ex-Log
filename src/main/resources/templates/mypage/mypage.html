@@ -33,6 +33,19 @@
         .nav-item { text-align: center; text-decoration: none; color: #ccc; font-size: 0.8rem; font-weight: 600; flex: 1; }
         .nav-item.active { color: var(--primary-color); }
         .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; font-style: normal; }
+
+        /* 추가된 디자인 요소 */
+        .motivation-warning {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #FFF3E0;
+            color: #E65100;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            border: 1px dashed #FFB74D;
+        }
     </style>
 </head>
 <body>
@@ -67,8 +80,9 @@
     </div>
 
     <div class="section-card">
-        <div class="section-title">운동 스트릭 (최근 45일)</div>
+        <div class="section-title">운동 스트릭 최근 45일</div>
         <div class="grass-grid" id="grass-container"></div>
+        <div class="motivation-warning">📧 3일 연속 운동 기록이 없을 시 동기부여 메일이 전송됩니다. 운동합시다!</div>
     </div>
 
     <div class="button-group">
