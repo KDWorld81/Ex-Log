@@ -8,6 +8,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    environment:
+      - TZ=Asia/Seoul
     depends_on:
       - ex-log-db
       - exlog-redis
@@ -19,6 +21,8 @@ services:
     container_name: ex-log-db
     env_file:
       - .env
+    environment:
+      - TZ=Asia/Seoul
     ports:
       - "3306:3306"
     volumes:
