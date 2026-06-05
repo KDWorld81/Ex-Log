@@ -59,6 +59,7 @@ SMTP_USERNAME=[Gmail 계정]
 SMTP_PASSWORD=[Gmail 앱 비밀번호]
 JWT_SECRET=[JWT 시크릿 키]
 JWT_ISSUER=[발급자]
+TZ=Asia/Seoul
 ```
 
 ---
